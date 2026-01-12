@@ -122,7 +122,7 @@ The mine counting algorithm:
 
 ## Demo
 
-Try the [interactive demo](http://mukelwe-m.github.io/minesweeper/)) to see the algorithm in action!
+Try the [interactive demo](http://mukelwe-m.github.io/minesweeper/) to see the algorithm in action!
 
 ## Contributing
 
