@@ -122,11 +122,7 @@ The mine counting algorithm:
 
 ## Demo
 
-Try the [interactive demo](https://yourusername.github.io/minesweeper/) to see the algorithm in action!
-
-## License
-
-MIT License - feel free to use and modify as needed.
+Try the [interactive demo](http://mukelwe-m.github.io/minesweeper/)) to see the algorithm in action!
 
 ## Contributing
 
@@ -134,8 +130,6 @@ Contributions are welcome! Feel free to submit issues or pull requests.
 
 ## Future Enhancements
 
-- Interactive grid creation
-- Configurable grid sizes
 - Game play functionality with revealing cells
 - Flag placement for suspected mines
 - Timer and scoring system
