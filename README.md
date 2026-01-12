@@ -1,9 +1,11 @@
 # Minesweeper
-Built minesweeper in Python to get practice in learning python. Built a Minesweeper game grid by calculating the number of adjacent mines for each cell.
+This code is a grid processor that:
 
-## Overview
+Takes a pre-defined grid with mines already placed
+Calculates how many mines are adjacent to each cell
+Displays the result
 
-This program takes a grid representation of a Minesweeper board and transforms it into a playable format where each mine-free cell displays the count of adjacent mines.
+It's the algorithm that powers Minesweeper, but not the actual game itself. Think of it as the "backend logic" or "number calculation engine."
 
 ## Features
 
