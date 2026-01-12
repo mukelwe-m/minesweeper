@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minesweeper Grid Processor Demo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #000000;
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            padding: 40px;
+            max-width: 900px;
+            width: 100%;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            text-align: center;
+            font-size: 2.5em;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 1.1em;
+        }
+
+        .controls {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        button {
+            background: linear-gradient(135deg, #5fa9bb 0%, #3e47bb 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .grids-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .grid-section {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 12px;
+        }
+
+        .grid-section h2 {
+            color: #444;
+            margin-bottom: 15px;
+            text-align: center;
+            font-size: 1.3em;
+        }
+
+        .grid {
+            display: inline-grid;
+            gap: 4px;
+            background: #ddd;
+            padding: 4px;
+            border-radius: 8px;
+        }
+
+        .cell {
+            width: 45px;
+            height: 45px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 18px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .cell.mine {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .cell.empty {
+            background: #ecf0f1;
+            color: #333;
+        }
+
+        .cell.editable:hover {
+            transform: scale(1.1);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+
+        .cell.count-0 { background: #95a5a6; color: #fff; }
+        .cell.count-1 { background: #3498db; color: #fff; }
+        .cell.count-2 { background: #2ecc71; color: #fff; }
+        .cell.count-3 { background: #f39c12; color: #fff; }
+        .cell.count-4 { background: #e67e22; color: #fff; }
+        .cell.count-5 { background: #e74c3c; color: #fff; }
+        .cell.count-6 { background: #9b59b6; color: #fff; }
+        .cell.count-7 { background: #34495e; color: #fff; }
+        .cell.count-8 { background: #1a1a1a; color: #fff; }
+
+        .info {
+            background: #e8f4f8;
+            padding: 20px;
+            border-radius: 12px;
+            border-left: 4px solid #667eea;
+        }
+
+        .info h3 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .info p {
+            color: #555;
+            line-height: 1.6;
+            margin-bottom: 8px;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 20px;
+            padding: 15px;
+            background: #f0f0f0;
+            border-radius: 8px;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 2em;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        @media (max-width: 768px) {
+            .grids-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .cell {
+                width: 35px;
+                height: 35px;
+                font-size: 14px;
+            }
+
+            h1 {
+                font-size: 1.8em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎮 Minesweeper Grid Processor</h1>
+        <p class="subtitle">Click cells to toggle mines, then process the grid to see the algorithm in action</p>
+        
+        <div class="controls">
+            <button onclick="processGrid()">⚡ Process Grid</button>
+            <button onclick="randomGrid()">🎲 Random Grid</button>
+            <button onclick="clearGrid()">🗑️ Clear Grid</button>
+            <button onclick="loadExample()">📋 Load Example</button>
+        </div>
+
+        <div class="grids-container">
+            <div class="grid-section">
+                <h2>Original Grid (Click to Edit)</h2>
+                <div id="originalGrid" class="grid"></div>
+            </div>
+            <div class="grid-section">
+                <h2>Processed Grid</h2>
+                <div id="processedGrid" class="grid"></div>
+            </div>
+        </div>
+
+        <div class="stats">
+            <div class="stat-item">
+                <div class="stat-value" id="mineCount">0</div>
+                <div class="stat-label">Mines</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="safeCells">25</div>
+                <div class="stat-label">Safe Cells</div>
+            </div>
+        </div>
+
+        <div class="info">
+            <h3>📖 How It Works</h3>
+            <p><strong>Grid Symbols:</strong> # = Mine, - = Empty spot</p>
+            <p><strong>Algorithm:</strong> For each empty cell, count all adjacent mines (8 directions: horizontal, vertical, diagonal)</p>
+            <p><strong>Result:</strong> Each dash is replaced with a number showing how many mines are nearby</p>
+            <p><strong>Try it:</strong> Click cells in the original grid to place/remove mines, then click "Process Grid"</p>
+        </div>
+    </div>
+
+    <script>
+        const GRID_SIZE = 5;
+        let grid = [];
+
+        function initGrid() {
+            grid = Array(GRID_SIZE).fill(null).map(() => 
+                Array(GRID_SIZE).fill('-')
+            );
+            renderOriginalGrid();
+            updateStats();
+        }
+
+        function renderOriginalGrid() {
+            const container = document.getElementById('originalGrid');
+            container.innerHTML = '';
+            container.style.gridTemplateColumns = `repeat(${GRID_SIZE}, 45px)`;
+            
+            grid.forEach((row, rowIdx) => {
+                row.forEach((cell, colIdx) => {
+                    const cellDiv = document.createElement('div');
+                    cellDiv.className = `cell editable ${cell === '#' ? 'mine' : 'empty'}`;
+                    cellDiv.textContent = cell;
+                    cellDiv.onclick = () => toggleCell(rowIdx, colIdx);
+                    container.appendChild(cellDiv);
+                });
+            });
+        }
+
+        function toggleCell(row, col) {
+            grid[row][col] = grid[row][col] === '#' ? '-' : '#';
+            renderOriginalGrid();
+            updateStats();
+        }
+
+        function withinBounds(row, col) {
+            return row >= 0 && row < GRID_SIZE && col >= 0 && col < GRID_SIZE;
+        }
+
+        function countAdjacentMines(row, col) {
+            let count = 0;
+            for (let rowOffset = -1; rowOffset <= 1; rowOffset++) {
+                for (let colOffset = -1; colOffset <= 1; colOffset++) {
+                    if (rowOffset === 0 && colOffset === 0) continue;
+                    
+                    const newRow = row + rowOffset;
+                    const newCol = col + colOffset;
+                    
+                    if (withinBounds(newRow, newCol) && grid[newRow][newCol] === '#') {
+                        count++;
+                    }
+                }
+            }
+            return count;
+        }
+
+        function processGrid() {
+            const processedGrid = grid.map((row, rowIdx) => 
+                row.map((cell, colIdx) => 
+                    cell === '#' ? '#' : String(countAdjacentMines(rowIdx, colIdx))
+                )
+            );
+            
+            renderProcessedGrid(processedGrid);
+        }
+
+        function renderProcessedGrid(processedGrid) {
+            const container = document.getElementById('processedGrid');
+            container.innerHTML = '';
+            container.style.gridTemplateColumns = `repeat(${GRID_SIZE}, 45px)`;
+            
+            processedGrid.forEach(row => {
+                row.forEach(cell => {
+                    const cellDiv = document.createElement('div');
+                    if (cell === '#') {
+                        cellDiv.className = 'cell mine';
+                        cellDiv.textContent = '💣';
+                    } else {
+                        cellDiv.className = `cell count-${cell}`;
+                        cellDiv.textContent = cell;
+                    }
+                    container.appendChild(cellDiv);
+                });
+            });
+        }
+
+        function randomGrid() {
+            grid = Array(GRID_SIZE).fill(null).map(() => 
+                Array(GRID_SIZE).fill(null).map(() => 
+                    Math.random() > 0.7 ? '#' : '-'
+                )
+            );
+            renderOriginalGrid();
+            updateStats();
+        }
+
+        function clearGrid() {
+            grid = Array(GRID_SIZE).fill(null).map(() => 
+                Array(GRID_SIZE).fill('-')
+            );
+            renderOriginalGrid();
+            document.getElementById('processedGrid').innerHTML = '';
+            updateStats();
+        }
+
+        function loadExample() {
+            grid = [
+                ['-','-','-','-','#'],
+                ['-','#','-','#','-'],
+                ['-','-','-','#','#'],
+                ['-','#','#','-','-'],
+                ['#','-','-','-','-']
+            ];
+            renderOriginalGrid();
+            updateStats();
+        }
+
+        function updateStats() {
+            const mineCount = grid.flat().filter(cell => cell === '#').length;
+            const safeCells = GRID_SIZE * GRID_SIZE - mineCount;
+            
+            document.getElementById('mineCount').textContent = mineCount;
+            document.getElementById('safeCells').textContent = safeCells;
+        }
+
+        // Initialize on load
+        loadExample();
+        processGrid();
+    </script>
+</body>
+</html>
